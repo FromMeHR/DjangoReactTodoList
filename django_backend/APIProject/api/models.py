@@ -7,5 +7,6 @@ class Post(models.Model):
     description = models.TextField()
     date = models.DateTimeField(default=timezone.now)
     completed = models.BooleanField(default=False)
+    username = models.CharField(max_length=100, default='')
     def __str__(self):
         return self.title

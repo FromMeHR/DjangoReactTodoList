@@ -21,6 +21,7 @@ function Login() {
         .then((resp) => {
             if (resp.token) {
               setToken('mytoken', resp.token);
+              localStorage.setItem('username', username)
             } 
             else {
               removeToken(['mytoken']);
@@ -40,6 +41,7 @@ function Login() {
           APIService.RegisterUser({username, password})
           .then(() => loginBtn())
           .catch(error => console.log(error))
+          localStorage.setItem('username', username)
         }
       })
     }

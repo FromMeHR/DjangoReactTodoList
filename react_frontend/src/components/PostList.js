@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { formatDate } from '../App';
 import APIService from './APIService';
 import Form from './Form';
@@ -10,6 +10,12 @@ import { MdDeleteForever } from "react-icons/md";
 function PostList(props) {
     const[selectedPostId, setSelectedPostId] = useState(null)
     const [token] = useCookies(['mytoken'])
+    const [username, setUsername] = useState('')
+    const filteredPosts = props.posts.filter(post => post.username === username);
+    useEffect(() => {
+        const storedUsername = localStorage.getItem('username')
+        setUsername(storedUsername)
+    }, [])
     const editBtn = (PostId) => {
         setSelectedPostId(PostId) 
     //     props.editBtn(PostId)
@@ -19,20 +25,18 @@ function PostList(props) {
             .then(() => props.deleteBtn(post))
             .catch(error => console.log(error))
     }
-
     const completePost = (post) => {
         APIService.UpdateCompleted(post.id, token['mytoken'])
             .then(resp => props.updatedData(resp))
             .catch(error => console.log(error))
     }
-
     const cancelForm = () => {
         setSelectedPostId(null)
     }
+
     return (
         <div>
-            {props.posts && props.posts.map(post => {
-            return (
+            {filteredPosts.map(post => (
             <div key = {post.id}>
                 <h2 className={`${post.completed ? 'completed' : ''}  post-text`}>{post.title}
                       <button
@@ -55,14 +59,13 @@ function PostList(props) {
                         <button className="btn btn-danger btn-select" onClick={() => deleteBtn(post)} style={{ marginLeft: '40px' }}><MdDeleteForever size={17}/> Delete</button>
                     </div>
                 </div><br/>
-                    <hr className="hor-line"/>
-                    {selectedPostId === post.id && (
-                    <Form post={post} updatedData={props.updatedData} addedPost={props.addedPost} cancelForm={cancelForm}/>
-                    )}
+                <hr className="hor-line"/>
+                {selectedPostId === post.id && (
+                <Form post={post} updatedData={props.updatedData} addedPost={props.addedPost} cancelForm={cancelForm}/>
+                )}
                 <hr className="hor-line"/>
             </div>
-            )
-        })}
+        ))}
         </div>
     )
 }

@@ -23,6 +23,8 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = (TokenAuthentication,)
+    def perform_create(self, serializer):
+        serializer.save(username=self.request.user.username)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
