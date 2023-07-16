@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import {Route, Routes, BrowserRouter} from 'react-router-dom';
 import Login from './components/Login';
 import {CookiesProvider} from 'react-cookie';
+import Profile from './components/Profile';
 
 function Router() {
   return(
@@ -15,6 +16,7 @@ function Router() {
         <Routes>
           <Route exact path="/" element={<Login/>} />
           <Route exact path="/posts" element={<App/>} />
+          <Route exact path="/settings" element={<Profile/>} />
         </Routes>
       </BrowserRouter>
     </CookiesProvider>

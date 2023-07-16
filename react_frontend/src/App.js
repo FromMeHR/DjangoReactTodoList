@@ -5,7 +5,6 @@ import Form from './components/Form';
 import {useCookies} from 'react-cookie';
 import {useNavigate} from 'react-router-dom';
 import { IoMdAdd } from "react-icons/io";
-import { TbLogout } from "react-icons/tb";
 
 export function formatDate(dateString) {
   const options = { month: 'long', day: 'numeric', year: 'numeric' }
@@ -18,7 +17,9 @@ function App() {
   const [editPost, setEditPost] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [token, setToken, removeToken] = useCookies(['mytoken'])
+  const [username, setUsername] = useState('')
   const [filter, setFilter] = useState("All")
+  const [selectedMenu, setSelectedMenu] = useState('Profile')
   const navigate = useNavigate()
   useEffect(() => {
     fetch('http://127.0.0.1:8000/api/posts/', {
@@ -34,9 +35,13 @@ function App() {
   }, [token])
   useEffect(() => {
     if(!token['mytoken']) {
-        navigate('/') // push users to the posts after login
+        navigate('/') // push users to the login
     }
   }, [token, navigate])
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username')
+    setUsername(storedUsername)
+  }, [])
 
   const editBtn = (PostId) => {
     const selectedPost = posts.find(post => post.id === PostId)
@@ -88,19 +93,36 @@ function App() {
     }
     return []
   }
+  const handleMenuBtn = (event) => {
+    setSelectedMenu(event.target.value)
+    if (event.target.value === 'Settings') {
+        navigate('/settings');
+    } 
+    else if (event.target.value === 'Log out') {
+        logoutBtn();
+    }
+  }
+  const handleHomeBtn = () => {
+    navigate('/posts')
+  }
   const logoutBtn = () => {
     removeToken(['mytoken'])
     localStorage.removeItem('username');
   }
   return (
     <div className="App">
-      <div className="row" style={{ marginLeft: '350px' }}>
+      <div className="row" style={{ marginLeft: '450px' }}>
         <div className="col">
          <h1>Todo List <button className="btn btn-success btn-select" onClick={openForm} style={{ marginLeft: '10px'}}><IoMdAdd size={17}/> New task</button>
           <select className="btn btn-secondary btn-select" value={filter} onChange={(e) => setFilter(e.target.value)} style={{ marginLeft: '20px', backgroundColor: 'orange', color: 'white' }}>
             <option value="All">All</option>
             <option value="Completed">Completed</option>
-          </select> <button className="btn btn-secondary btn-select" onClick={logoutBtn} style={{ marginLeft: '10px', backgroundColor: 'black', color: 'white' }}><TbLogout size={17}/> Log out</button></h1>
+          </select> <button className="btn btn-primary btn-select" style={{ marginLeft: '12px'}} onClick={handleHomeBtn}>HOME</button>
+          <select className="btn btn-secondary btn-select" style={{ marginLeft: '18px', backgroundColor: 'black', color: 'white' }} value={selectedMenu} onChange={handleMenuBtn}>
+              <option value="Profile" disabled hidden>Profile</option>
+              <option value="Settings">Settings</option>
+              <option value="Log out">Log out</option>
+          </select></h1>
         </div>
       </div>
       <hr/>

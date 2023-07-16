@@ -29,6 +29,10 @@
 .btn-select {
   height: 37px; 
 }
+.grey {
+  color: grey;
+  vertical-align: middle;
+}
 p {
   line-height: 1;
 }
