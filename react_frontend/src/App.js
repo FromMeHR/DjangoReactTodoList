@@ -5,12 +5,19 @@ import Form from './components/Form';
 import {useCookies} from 'react-cookie';
 import {useNavigate} from 'react-router-dom';
 import { IoMdAdd } from "react-icons/io";
-
 export function formatDate(dateString) {
-  const options = { month: 'long', day: 'numeric', year: 'numeric' }
   const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', options)
-} 
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July','August', 'September', 'October', 'November', 'December']
+  const month = months[date.getMonth()]
+  const day = date.getDate()
+  const year = date.getFullYear()
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  const amPm = hours >= 12 ? 'p.m.' : 'a.m.'
+  const formattedHours = hours % 12 === 0 ? 12 : hours % 12
+  const formattedMinutes = minutes.toString().padStart(2, '0')
+  return `${month} ${day}, ${year}, ${formattedHours}:${formattedMinutes} ${amPm}`
+}
 
 function App() {
   const [posts, setPosts] = useState([])

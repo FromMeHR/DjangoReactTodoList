@@ -33,7 +33,26 @@
   color: grey;
   vertical-align: middle;
 }
-p {
+.section-button {
+  background: none;
+  border: none;
+  text-decoration: underline;
+  color: white;
+  font-size: 20px;
+  padding: 12px 22px; 
+  transition: background-color 0.3s;
+}
+.section-button:hover {
+  background-color: rgb(70, 70, 70); 
+}
+.section-button.active {
+  font-weight: bold;
+  border-bottom: 2px solid black;
+  background: black;
+  text-decoration: none;
+  color: white;
+}
+div {
   line-height: 1;
 }
 

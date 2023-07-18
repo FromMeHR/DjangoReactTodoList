@@ -5,7 +5,7 @@ from .serializers import PostSerializer, UserSerializer
 # from rest_framework.parsers import JSONParser
 # from rest_framework.decorators import api_view
 # from rest_framework.response import Response
-# from rest_framework import status
+from rest_framework import status
 # from rest_framework.decorators import APIView
 # from rest_framework import generics
 # from rest_framework import mixins
@@ -27,6 +27,46 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save(username=self.request.user.username)
 
 class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = (TokenAuthentication,)
+    @action(detail=False, methods=['PUT'])
+    def update_username(self, request):
+        if not request.user.is_authenticated:
+            return Response({'error': 'Authentication required to update username'}, status=status.HTTP_401_UNAUTHORIZED)
+        user = request.user
+        new_username = request.data.get('new_username')
+        if not new_username:
+            return Response({'error': 'New username is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if User.objects.filter(username=new_username).exclude(pk=user.pk).exists():
+            return Response({'error': 'This username is already taken by another user'}, status=status.HTTP_400_BAD_REQUEST)
+        if Post.objects.filter(username=new_username).exclude(username=user.username).exists():
+            return Response({'error': 'This username is already used for creating posts'}, status=status.HTTP_400_BAD_REQUEST)
+        user = request.user
+        user_posts = Post.objects.filter(username=user.username)
+        user_posts.update(username=new_username) 
+        user.username = new_username
+        user.save()
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
+    @action(detail=False, methods=['PUT'])
+    def update_password(self, request):
+        if not request.user.is_authenticated:
+            return Response({'error': 'Authentication required to update password'}, status=status.HTTP_401_UNAUTHORIZED)
+        user = request.user
+        old_password = request.data.get('old_password')
+        new_password = request.data.get('new_password')
+        if not old_password or not new_password:
+            return Response({'error': 'Old password and new password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not user.check_password(old_password):
+            return Response({'error': 'Old password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(new_password)
+        user.save()
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
+    
+class CkeckUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
